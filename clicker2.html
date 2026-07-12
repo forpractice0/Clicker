@@ -1,0 +1,138 @@
+<div style="display: flex; flex-direction: column; align-items: center; padding: 40px 20px; background-color: transparent; border-radius: 16px; margin: 20px 0;">
+
+<div id="keycap-container" style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; max-width: 100%;"></div>
+
+<style>
+.dynamic-keycap {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  background: linear-gradient(to bottom, #fdfdfd, #e6e6e6);
+  border: 2px solid #d1d1d1;
+  border-radius: 12px 12px 18px 18px;
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+  touch-action: manipulation;
+  box-shadow:
+    0 12px 0 var(--shadow-color, #d1d1d1),
+    0 15px 20px rgba(0,0,0,0.15);
+  transition: all 0.05s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dynamic-keycap:active,
+.dynamic-keycap.pressed {
+  top: 10px;
+  box-shadow:
+    0 2px 0 var(--shadow-color, #b3b3b3),
+    0 4px 5px rgba(0,0,0,0.2) !important;
+  background: linear-gradient(to bottom, #e6e6e6, #d9d9d9) !important;
+}
+
+.dynamic-keycap img {
+  width: 100px;
+  height: 100px;
+  pointer-events: none;
+  border-radius: 12px;
+}
+</style>
+
+<script>
+(function() {
+
+  const container = document.getElementById('keycap-container');
+
+  const keycapList = [
+    {
+      img: "https://i.imgur.com/B1pmBUy.png",
+      sound: "https://www.image2url.com/r2/default/audio/1783804622546-5e71fd65-ce5b-4408-b7d7-f7b57987c740.mp3",
+      shadowColor: "#C9D49C",
+      bindKey: "1"
+    },
+    {
+      img: "https://i.imgur.com/Rytwlmh.png",
+      sound: "https://www.image2url.com/r2/default/audio/1783804622546-5e71fd65-ce5b-4408-b7d7-f7b57987c740.mp3",
+      shadowColor: "#FBF5DF",
+      bindKey: "2"
+    },
+    {
+      img: "https://i.imgur.com/aKmozAZ.png",
+      sound: "https://www.image2url.com/r2/default/audio/1783804622546-5e71fd65-ce5b-4408-b7d7-f7b57987c740.mp3",
+      shadowColor: "#9E7ACB",
+      bindKey: "3"
+    },
+    {
+      img: "https://i.imgur.com/EyqOS98.png",
+      sound: "https://www.image2url.com/r2/default/audio/1783804622546-5e71fd65-ce5b-4408-b7d7-f7b57987c740.mp3",
+      shadowColor: "#C3E5E7",
+      bindKey: "4"
+    }
+  ];
+
+  const activeKeycaps = [];
+
+  // 페이지 로드시 전부 생성
+  keycapList.forEach(currentData => {
+
+    const newKeycap = document.createElement('button');
+    newKeycap.className = 'dynamic-keycap';
+
+    newKeycap.style.setProperty(
+      '--shadow-color',
+      currentData.shadowColor
+    );
+
+    newKeycap.innerHTML =
+      `<img src="${currentData.img}" alt="키캡 이미지">`;
+
+    const clickSound = new Audio(currentData.sound);
+
+    function triggerClick() {
+      clickSound.currentTime = 0;
+      clickSound.play().catch(() => {});
+    }
+
+    newKeycap.addEventListener(
+      'pointerdown',
+      triggerClick
+    );
+
+    container.appendChild(newKeycap);
+
+    activeKeycaps.push({
+      element: newKeycap,
+      trigger: triggerClick,
+      bindKey: currentData.bindKey.toLowerCase()
+    });
+  });
+
+  window.addEventListener('keydown', function(e) {
+    if (e.repeat) return;
+
+    const pressedKey = e.key.toLowerCase();
+
+    activeKeycaps.forEach(keycap => {
+      if (keycap.bindKey === pressedKey) {
+        keycap.trigger();
+        keycap.element.classList.add('pressed');
+      }
+    });
+  });
+
+  window.addEventListener('keyup', function(e) {
+    const releasedKey = e.key.toLowerCase();
+
+    activeKeycaps.forEach(keycap => {
+      if (keycap.bindKey === releasedKey) {
+        keycap.element.classList.remove('pressed');
+      }
+    });
+  });
+
+})();
+</script>
+
+</div>
